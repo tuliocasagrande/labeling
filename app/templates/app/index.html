@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+
+{% if request.user.is_authenticated %}
+  <ul>
+    <li><a href="/accounts/logout/">Logout</a></li>
+  </ul>
+  <h3>Hello,
+    {% if request.user.first_name or request.user.last_name %}
+      {{ request.user.first_name }} {{ request.user.last_name }}
+    {% else %}
+      {{ request.user.username }}
+    {% endif %}
+  !</h3>
+
+  <h3>New dataset</h3>
+    <form action="{% url 'new_dataset' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+      <input type="file" name="dataset" required >
+    <input type="submit">
+  </form>
+
+{% else %}
+  {% load socialaccount %}
+  <ul>
+    <li><a href="/accounts/login/" class="pull-right">Login</a></li>
+    <li><a href="{% provider_login_url "google" %}">Connect with Google</a></li>
+  </ul>
+{% endif %}
+
+</body>
+</html>
