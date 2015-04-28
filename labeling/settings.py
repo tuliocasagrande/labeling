@@ -29,7 +29,7 @@ DEBUG = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/labeling/static/'
-
+STATIC_ROOT = '/var/www/labeling/static'
 SITE_ID = 2
 
 ALLOWED_HOSTS = []
