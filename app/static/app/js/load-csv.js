@@ -14,7 +14,7 @@ $(function(){
   }
 
   function displayContents(contents) {
-    var element = document.getElementById("select-class");
+    var element = document.getElementById("label-column-name");
     element.innerHTML = contents.substring(0, contents.indexOf("\n"));
 
     var header = new CSV(contents).parse()[0];

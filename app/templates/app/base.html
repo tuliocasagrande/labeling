@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Labeling{% endblock %}</title>
+  {% load staticfiles %}
+  <link rel="stylesheet" href={% static 'vendor/css/bootstrap.min.css' %}>
+  <link rel="stylesheet" href={% static 'app/css/base.css' %} />
+</head>
+<body>
+  <nav>
+    {% if request.user.is_authenticated %}
+    <ul>
+      <li><a href="{% url 'account_logout' %}">Logout</a></li>
+    </ul>
+    {% if request.user.first_name or request.user.last_name %}
+    <h3>Hello, {{ request.user.first_name }} {{ request.user.last_name }}!</h3>
+    {% else %}
+    <h3>Hello, {{ request.user.username }}!</h3>
+    {% endif %}
+
+    {% else %}
+    {% load socialaccount %}
+    <ul>
+      <li><a href="{% url 'account_login' %}" class="pull-right">Login</a></li>
+      <li><a href="{% provider_login_url "google" %}">Connect with Google</a></li>
+    </ul>
+    {% endif %}
+  </nav>
+
+  <article class="container">
+    {% block content %}{% endblock %}
+  </article>
+
+  <footer></footer>
+
+  {% block js %}{% endblock %}
+</body>
+</html>
