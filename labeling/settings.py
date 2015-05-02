@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
+    # 'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'app',
@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'widget_tweaks',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,7 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                # 'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -119,7 +120,9 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-LOGIN_REDIRECT_URL = '/'
+# Allauth configurations
+LOGIN_REDIRECT_URL = 'index'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'index'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -127,3 +130,16 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': { 'access_type': 'online' }
     }
 }
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+
+# SendGrid
+DEFAULT_FROM_EMAIL = 'lasid.sor.ufscar.br/labeling'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = os.environ['SENDGRID_USR']
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PWD']
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

@@ -3,12 +3,12 @@
 {% block title %}Labeling{% endblock %}
 
 {% block content %}
-  {% if request.user.is_authenticated %}
-    <a href={% url 'new_dataset' %}>New dataset</a>
-  {% else %}
-    <h3>Sign up or login and start labeling today!</h3>
-  {% endif %}
+  <div class="jumbotron">
+    <h1>Labeling center</h1>
+    <p>This website is intended to help you label your machine learning classification datasets. You can upload your dataset as a CSV file and add colaborators (a.k.a grad students) to label your samples.</p>
+    <p>Sign up and start labeling today!</p>
+    <p>
+      <a class="btn btn-lg btn-primary" href="{% url 'account_signup' %}" role="button">Sign up</a>
+    </p>
+  </div>
 {% endblock %}
-
-{% block js %}{% endblock %}
-
