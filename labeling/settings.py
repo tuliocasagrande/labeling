@@ -23,7 +23,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['LB_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+# SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -32,7 +39,7 @@ STATIC_URL = '/labeling/static/'
 STATIC_ROOT = '/var/www/labeling/static'
 SITE_ID = 2
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['lasid.sor.ufscar.br']
 
 
 # Application definition
@@ -139,7 +146,7 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # SendGrid
 DEFAULT_FROM_EMAIL = 'lasid.sor.ufscar.br/labeling'
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = os.environ['SENDGRID_USR']
-EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PWD']
+EMAIL_HOST_USER = os.environ['LB_SENDGRID_USR']
+EMAIL_HOST_PASSWORD = os.environ['LB_SENDGRID_PWD']
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
