@@ -4,9 +4,18 @@ from django.contrib.auth.models import User
 class Dataset(models.Model):
   owner = models.ForeignKey(User)
   title = models.CharField(max_length=50)
-  header = models.TextField(null=True, blank=True)
+  privacy = models.CharField(default='restricted', max_length=10)
   number_of_labels = models.IntegerField(default=2)
-  label_column_name = models.CharField(max_length=50)
+  header = models.TextField(null=True, blank=True)
+  label_name = models.CharField(max_length=50, null=True, blank=True)
+
+  def __unicode__(self):
+    return self.title
+
+class Contribution(models.Model):
+  dataset = models.ForeignKey(Dataset)
+  contributor = models.ForeignKey(User)
+  active = models.BooleanField(default=True)
 
 class Sample(models.Model):
   dataset = models.ForeignKey(Dataset)

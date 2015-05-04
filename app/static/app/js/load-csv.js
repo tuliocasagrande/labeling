@@ -12,11 +12,11 @@ function readDataset(file) {
 
 function displayHeader(contents) {
   var header = new CSV(contents).parse()[0];
-  var $label_column_name = $("#label-column-name");
-  $label_column_name.html("");
+  var $label_name = $("#label_name");
+  $label_name.html("");
   header.forEach(function(record) {
     option = '<option value="'+record+'">'+record+'</option>';
-    $label_column_name.prepend(option);
+    $label_name.prepend(option);
   });
 }
 
@@ -28,11 +28,11 @@ $(function(){
   // Just in case the user clicks the browser's back button
   $("#dataset").change();
 
-  $("#has-header").change(function() {
+  $("#has_header").change(function() {
     if ($(this).is(":checked")) {
-      $("#label-column-name").prop('disabled', false);
+      $("#label_name").prop('disabled', false);
     } else {
-      $("#label-column-name").prop('disabled', true);
+      $("#label_name").prop('disabled', true);
     }
   });
 });

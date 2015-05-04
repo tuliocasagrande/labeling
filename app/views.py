@@ -1,39 +1,104 @@
+import csv
+from cStringIO import StringIO
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
-from app.models import Dataset
+from app.models import Dataset, Sample, Label
+from django.contrib.auth.models import User
 
 # GET /
 def index(request):
   if request.user.is_authenticated():
-    q = Dataset.objects.filter(owner=request.user.id)
-    print q
+    query = Dataset.objects.filter(owner=request.user.id)
+    print '{0} datasets!!!'.format(len(query))
+    query.delete()
+
     return render(request, 'app/dashboard.html')
   else:
     return render(request, 'app/index.html')
 
-# GET /dataset/new
-# POST /dataset/new
+# GET /datasets/new
+# POST /datasets/new
 @login_required
-def dataset_new(request):
+def datasets_new(request):
   if request.method == 'POST':
-    print request.POST['title']
-    print request.POST['number_of_labels']
-    print request.POST.get('has_header', False)
-    print request.POST['label_column_name']
-    dataset = request.FILES['dataset']
-    s = ''
-    if dataset:
-      for line in dataset:
-        s += line
+    dataset = Dataset()
+    dataset.owner = request.user
+    dataset.title = request.POST['title']
+    dataset.number_of_labels = request.POST['number_of_labels']
+    dataset.privacy = request.POST['privacy']
 
-    return HttpResponse(s)
+    has_header = request.POST.get('has_header', False)
+    dataset_file = request.FILES['dataset']
+    reader = csv.reader(dataset_file)
+    if has_header:
+      dataset.label_name = request.POST['label_name']
+      header_list = next(reader)
+      label_index = header_list.index(dataset.label_name)
+      header_list.pop(label_index)
+
+      dataset.header = _write_row(header_list).strip()
+
+    dataset.save()
+
+    legacy_labels_owner = User.objects.get(username='legacy_labels_owner')
+    for row_list in reader:
+      if has_header:
+        print row_list
+        label_string = row_list.pop(label_index)
+        print label_string
+
+        row = _write_row(row_list).strip()
+        sample = Sample(dataset=dataset, data=row)
+        sample.save()
+
+        if label_string:
+          label = Label(owner=legacy_labels_owner, sample=sample, label=label_string)
+          label.sample = sample
+          label.save()
+
+      else:
+        row = _write_row(row_list).strip()
+        sample = Sample(dataset=dataset, data=row)
+        sample.save()
+
+
+
+    return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
   elif request.method == 'GET':
-    return render(request, 'app/dataset_new.html', {})
+    return render(request, 'app/datasets_new.html')
+
+# GET /datasets/<datasets_id>
+def datasets_show(request, datasets_id):
+  dataset = get_object_or_404(Dataset, pk=datasets_id)
+  print dataset
+  print dataset.owner
+  print dataset.number_of_labels
+  print dataset.privacy
+  print dataset.header
+  print dataset.label_name
+
+  samples = Sample.objects.filter(dataset=dataset)
+  s = '{0},"{1}"\n'.format(dataset.header, dataset.label_name)
+  print '{0} samples!!!'.format(len(samples))
+  for each in samples:
+    label = ''
+    s += '{0},{1}\n'.format(each.data, label)
+
+  return HttpResponse(s, content_type="text/plain")
+
 
 # GET /accounts/profile
 @login_required
-def account_profile(request):
-  return render(request, 'app/account_profile.html', {})
+def accounts_profile(request):
+  return render(request, 'app/accounts_profile.html', {})
+
+def _write_row(row_list):
+  output = StringIO()
+  csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(row_list)
+  value = output.getvalue()
+  output.close()
+  return value

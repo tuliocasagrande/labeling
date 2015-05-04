@@ -13,9 +13,22 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Contribution',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('active', models.BooleanField(default=True)),
+                ('contributor', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Dataset',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.CharField(max_length=50)),
+                ('privacy', models.CharField(default=b'restricted', max_length=10)),
+                ('number_of_labels', models.IntegerField(default=2)),
+                ('header', models.TextField(null=True, blank=True)),
+                ('label_name', models.CharField(max_length=50, null=True, blank=True)),
                 ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -32,7 +45,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('data', models.TextField()),
-                ('number_of_classes', models.IntegerField(default=2)),
                 ('dataset', models.ForeignKey(to='app.Dataset')),
             ],
         ),
@@ -40,5 +52,10 @@ class Migration(migrations.Migration):
             model_name='label',
             name='sample',
             field=models.ForeignKey(to='app.Sample'),
+        ),
+        migrations.AddField(
+            model_name='contribution',
+            name='dataset',
+            field=models.ForeignKey(to='app.Dataset'),
         ),
     ]
