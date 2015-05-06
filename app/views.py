@@ -30,6 +30,9 @@ def datasets_new(request):
     dataset.number_of_labels = request.POST['number_of_labels']
     dataset.privacy = request.POST['privacy']
 
+    if dataset.privacy not in ['public', 'restricted', 'private']:
+      return render(request, '400.html', status=400)
+
     has_header = request.POST.get('has_header', False)
     dataset_file = request.FILES['dataset']
     reader = csv.reader(dataset_file)
@@ -46,25 +49,20 @@ def datasets_new(request):
     legacy_labels_owner = User.objects.get(username='legacy_labels_owner')
     for row_list in reader:
       if has_header:
-        print row_list
         label_string = row_list.pop(label_index)
-        print label_string
-
         row = _write_row(row_list).strip()
+
         sample = Sample(dataset=dataset, data=row)
         sample.save()
 
         if label_string:
           label = Label(owner=legacy_labels_owner, sample=sample, label=label_string)
-          label.sample = sample
           label.save()
 
       else:
         row = _write_row(row_list).strip()
         sample = Sample(dataset=dataset, data=row)
         sample.save()
-
-
 
     return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
@@ -73,23 +71,35 @@ def datasets_new(request):
 
 # GET /datasets/<datasets_id>
 def datasets_show(request, datasets_id):
+  return HttpResponse(datasets_id);
+
+# GET /datasets/<datasets_id>/download
+def datasets_download(request, datasets_id):
   dataset = get_object_or_404(Dataset, pk=datasets_id)
-  print dataset
-  print dataset.owner
-  print dataset.number_of_labels
-  print dataset.privacy
-  print dataset.header
-  print dataset.label_name
+
+  # TODO: privacy
+  # if datataset.privacy == 'private':
+  #  contributors = Contributor.objects.filter...
+  #    if request.user not int contributors...
+  #      raise forbidden
 
   samples = Sample.objects.filter(dataset=dataset)
-  s = '{0},"{1}"\n'.format(dataset.header, dataset.label_name)
+  csv = u'{0},"{1}"\n'.format(dataset.header, dataset.label_name)
   print '{0} samples!!!'.format(len(samples))
-  for each in samples:
-    label = ''
-    s += '{0},{1}\n'.format(each.data, label)
+  for sample in samples:
+    labels = Label.objects.filter(sample=sample) #TODO: add active contributors
+    if labels:
+      label_list = [l.label for l in labels]
 
-  return HttpResponse(s, content_type="text/plain")
+      # Finding the mode
+      label = max(set(label_list), key=label_list.count)
+    else:
+      label = ''
+    csv += u'{0},{1}\n'.format(sample.data, label)
 
+  response = HttpResponse(csv, content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(dataset.title)
+  return response
 
 # GET /accounts/profile
 @login_required
@@ -98,7 +108,7 @@ def accounts_profile(request):
 
 def _write_row(row_list):
   output = StringIO()
-  csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(row_list)
+  csv.writer(output, quoting=csv.QUOTE_ALL).writerow(row_list)
   value = output.getvalue()
   output.close()
   return value
