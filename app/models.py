@@ -12,6 +12,20 @@ class Dataset(models.Model):
   def __unicode__(self):
     return self.title
 
+  def privacy_validation(self, privacy):
+    if privacy in ['public', 'restricted', 'private']:
+      self.privacy = privacy
+      return True
+    return False
+
+  def is_accessible(self, user):
+    if self.owner == user or self.privacy in ['public', 'restricted']:
+      return True
+
+    contributors = Contribution.objects.filter(dataset=self, active=True)
+    if user in [c.contributor for c in contributors]:
+      return True
+
 class Contribution(models.Model):
   dataset = models.ForeignKey(Dataset)
   contributor = models.ForeignKey(User)

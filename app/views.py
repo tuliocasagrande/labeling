@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.core.exceptions import PermissionDenied
 
 from app.models import Dataset, Sample, Label
 from django.contrib.auth.models import User
@@ -28,9 +29,8 @@ def datasets_new(request):
     dataset.owner = request.user
     dataset.title = request.POST['title']
     dataset.number_of_labels = request.POST['number_of_labels']
-    dataset.privacy = request.POST['privacy']
 
-    if dataset.privacy not in ['public', 'restricted', 'private']:
+    if not dataset.privacy_validation(request.POST['privacy']):
       return render(request, '400.html', status=400)
 
     has_header = request.POST.get('has_header', False)
@@ -67,21 +67,24 @@ def datasets_new(request):
     return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
   elif request.method == 'GET':
-    return render(request, 'app/datasets_new.html')
+    return render(request, 'app/datasets/new.html')
 
 # GET /datasets/<datasets_id>
 def datasets_show(request, datasets_id):
-  return HttpResponse(datasets_id);
+  dataset = get_object_or_404(Dataset, pk=datasets_id)
+
+  if not dataset.is_accessible(request.user):
+    raise PermissionDenied
+
+  context = {'dataset': dataset}
+  return render(request, 'app/datasets/show.html', context)
 
 # GET /datasets/<datasets_id>/download
 def datasets_download(request, datasets_id):
   dataset = get_object_or_404(Dataset, pk=datasets_id)
 
-  # TODO: privacy
-  # if datataset.privacy == 'private':
-  #  contributors = Contributor.objects.filter...
-  #    if request.user not int contributors...
-  #      raise forbidden
+  if not dataset.is_accessible(request.user):
+    raise PermissionDenied
 
   samples = Sample.objects.filter(dataset=dataset)
   csv = u'{0},"{1}"\n'.format(dataset.header, dataset.label_name)

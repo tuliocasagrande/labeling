@@ -1,0 +1,8 @@
+{% extends "app/base.html" %}
+
+{% block title %}Show dataset · Labeling{% endblock %}
+
+{% block content %}
+<a class="btn btn-primary" href="{% url 'datasets_download' dataset.id %}" role="button">Download</a>
+
+{% endblock %}
