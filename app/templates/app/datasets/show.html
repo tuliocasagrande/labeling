@@ -3,6 +3,31 @@
 {% block title %}Show dataset · Labeling{% endblock %}
 
 {% block content %}
-<a class="btn btn-primary" href="{% url 'datasets_download' dataset.id %}" role="button">Download</a>
 
+<p>{{ dataset.name }}</p>
+<div id="contributors">
+{% for c in contributors %}
+  <p>{{ c.contributor }}</p>
+{% endfor %}
+</div>
+
+
+<form id="add_contributor" action="{% url 'contributors_create' dataset.id %}" method="POST">
+  {% csrf_token %}
+
+  <div id="typeahead_contributor">
+    <input class="typeahead form-control" name="contributor" id="contributor" type="text" autocomplete="off" placeholder="Search contributors">
+  </div>
+
+  <input class="btn btn-primary" type="submit" value="Add contributor">
+</form>
+
+<a class="btn btn-primary" href="{% url 'datasets_download' dataset.id %}" role="button">Download</a>
+{% endblock %}
+
+{% block js %}
+  {% load staticfiles %}
+  <script src="{% static 'vendor/js/typeahead.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/js/js.cookie.js' %}"></script>
+  <script src="{% static 'app/js/load-contributors.js' %}"></script>
 {% endblock %}

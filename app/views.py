@@ -2,11 +2,11 @@ import csv
 from cStringIO import StringIO
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
 
-from app.models import Dataset, Sample, Label
+from app.models import Dataset, Sample, Label, Contribution
 from django.contrib.auth.models import User
 
 # GET /
@@ -27,7 +27,7 @@ def datasets_new(request):
   if request.method == 'POST':
     dataset = Dataset()
     dataset.owner = request.user
-    dataset.title = request.POST['title']
+    dataset.name = request.POST['name']
     dataset.number_of_labels = request.POST['number_of_labels']
 
     if not dataset.privacy_validation(request.POST['privacy']):
@@ -46,7 +46,6 @@ def datasets_new(request):
 
     dataset.save()
 
-    legacy_labels_owner = User.objects.get(username='legacy_labels_owner')
     for row_list in reader:
       if has_header:
         label_string = row_list.pop(label_index)
@@ -56,7 +55,7 @@ def datasets_new(request):
         sample.save()
 
         if label_string:
-          label = Label(owner=legacy_labels_owner, sample=sample, label=label_string)
+          label = Label(owner=request.user, sample=sample, label=label_string)
           label.save()
 
       else:
@@ -69,21 +68,27 @@ def datasets_new(request):
   elif request.method == 'GET':
     return render(request, 'app/datasets/new.html')
 
-# GET /datasets/<datasets_id>
-def datasets_show(request, datasets_id):
-  dataset = get_object_or_404(Dataset, pk=datasets_id)
+# GET /datasets/<dataset_id>
+def datasets_show(request, dataset_id):
+  dataset = get_object_or_404(Dataset, pk=dataset_id)
 
-  if not dataset.is_accessible(request.user):
+  if not dataset.is_accessible_to(request.user):
     raise PermissionDenied
 
-  context = {'dataset': dataset}
+  if dataset.is_owned_by(request.user):
+    contributors = Contribution.objects.filter(dataset=dataset, active=True)
+  else:
+    contributors = []
+
+  print contributors
+  context = {'dataset': dataset, 'contributors': contributors}
   return render(request, 'app/datasets/show.html', context)
 
-# GET /datasets/<datasets_id>/download
-def datasets_download(request, datasets_id):
-  dataset = get_object_or_404(Dataset, pk=datasets_id)
+# GET /datasets/<dataset_id>/download
+def datasets_download(request, dataset_id):
+  dataset = get_object_or_404(Dataset, pk=dataset_id)
 
-  if not dataset.is_accessible(request.user):
+  if not dataset.is_accessible_to(request.user):
     raise PermissionDenied
 
   samples = Sample.objects.filter(dataset=dataset)
@@ -101,8 +106,35 @@ def datasets_download(request, datasets_id):
     csv += u'{0},{1}\n'.format(sample.data, label)
 
   response = HttpResponse(csv, content_type='text/csv')
-  response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(dataset.title)
+  response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(dataset.name)
   return response
+
+def contributors_create(request, dataset_id):
+  if request.method == 'POST':
+    try:
+      dataset = Dataset.objects.get(pk=dataset_id)
+      user = User.objects.get(username=request.POST['contributor'])
+      Contribution(dataset=dataset, contributor=user).save()
+      return HttpResponse(status=200)
+    except Exception, e:
+      return HttpResponse(status=400)
+
+def contributors_destroy(request, dataset_id, contributor):
+  if request.method == 'DELETE':
+    try:
+      dataset = Dataset.objects.get(pk=dataset_id)
+      user = User.objects.get(username=contributor)
+      Contribution.objects.get(dataset=dataset, contributor=user).delete()
+      return HttpResponse(status=200)
+    except Exception, e:
+      return HttpResponse(status=400)
+
+def contributors_search(request, query):
+  if request.is_ajax():
+    users = User.objects.filter(username__contains=query)
+    array = [dict(value='{0}'.format(u.username)) for u in users]
+    return JsonResponse(array, safe=False)
+
 
 # GET /accounts/profile
 @login_required
