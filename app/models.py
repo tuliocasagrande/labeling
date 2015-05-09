@@ -29,12 +29,15 @@ class Dataset(models.Model):
     return False
 
   def is_owned_by(self, user):
-    return True if self.owner == user else False
+    return self.owner == user
 
 class Contribution(models.Model):
   dataset = models.ForeignKey(Dataset)
   contributor = models.ForeignKey(User)
   active = models.BooleanField(default=True)
+
+  class Meta:
+    unique_together = ('dataset', 'contributor')
 
 class Sample(models.Model):
   dataset = models.ForeignKey(Dataset)
@@ -44,3 +47,6 @@ class Label(models.Model):
   sample = models.ForeignKey(Sample)
   owner = models.ForeignKey(User)
   label = models.SmallIntegerField()
+
+  class Meta:
+    unique_together = ('sample', 'owner')
