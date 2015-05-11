@@ -2,17 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from app.models import Dataset
+from app.models import Contribution, Dataset
 from django.contrib.auth.models import User
 
 # GET /
 def index(request):
   if request.user.is_authenticated():
-    query = Dataset.objects.filter(owner=request.user.id)
-    print '{0} datasets!!!'.format(len(query))
-    query.delete()
+    my_datasets = Dataset.objects.filter(owner=request.user.id)
+    others_datasets = Contribution.objects.filter(contributor=request.user.id)
 
-    return render(request, 'app/dashboard.html')
+    context = {'my_datasets': my_datasets, 'others_datasets': others_datasets}
+    return render(request, 'app/dashboard.html', context)
   else:
     return render(request, 'app/index.html')
 

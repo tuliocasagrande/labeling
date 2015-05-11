@@ -1,6 +1,5 @@
-/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 50px;
+  padding-top: 20px;
   padding-bottom: 20px;
 }
 
@@ -12,3 +11,14 @@ body {
   text-align:center;
   border-top:1px solid #e5e5e5
 }
+
+/* Most typeahead customizations come from typeahead.css */
+.tt-suggestion {
+  cursor: pointer;
+}
+.tt-dataset :hover, .tt-cursor {
+  /* navbar colors */
+  color: #9d9d9d;
+  background-color: #333;
+}
+

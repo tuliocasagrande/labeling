@@ -2,16 +2,21 @@ import csv
 from cStringIO import StringIO
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.exceptions import PermissionDenied
 
 from app.models import Dataset, Sample, Label, Contribution
 
 # GET /datasets/new
-# POST /datasets/new
 @login_required
 def new(request):
+  if request.method == 'GET':
+    return render(request, 'app/datasets/new.html')
+
+# POST /datasets/create
+@login_required
+def create(request):
   if request.method == 'POST':
     dataset = Dataset()
     dataset.owner = request.user
@@ -53,23 +58,38 @@ def new(request):
 
     return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
-  elif request.method == 'GET':
-    return render(request, 'app/datasets/new.html')
-
 # GET /datasets/<dataset_id>
 def show(request, dataset_id):
-  dataset = get_object_or_404(Dataset, pk=dataset_id)
+  if request.method == 'GET':
+    dataset = get_object_or_404(Dataset, pk=dataset_id)
 
-  if not dataset.is_accessible_to(request.user):
-    raise PermissionDenied
+    if not dataset.is_accessible_to(request.user):
+      raise PermissionDenied
 
-  if dataset.is_owned_by(request.user):
-    contributors = Contribution.objects.filter(dataset=dataset, active=True)
-  else:
-    contributors = []
+    user_is_owner = dataset.is_owned_by(request.user)
+    if user_is_owner:
+      contributors = Contribution.objects.filter(dataset=dataset, active=True)
+    else:
+      contributors = []
 
-  context = {'dataset': dataset, 'contributors': contributors}
-  return render(request, 'app/datasets/show.html', context)
+    context = {'dataset': dataset, 'contributors': contributors,
+               'user_is_owner': user_is_owner}
+    return render(request, 'app/datasets/show.html', context)
+
+# DELETE /datasets/<dataset_id>/destroy
+@login_required
+def destroy(request, dataset_id):
+  if request.method == 'DELETE':
+    try:
+      dataset = Dataset.objects.get(pk=dataset_id)
+      if not dataset.is_owned_by(request.user):
+        raise PermissionDenied
+
+      dataset.delete()
+      return JsonResponse(dict(redirect=reverse('index')))
+    except Exception, e:
+      raise e
+      return HttpResponse(status=400)
 
 # GET /datasets/<dataset_id>/download
 def download(request, dataset_id):

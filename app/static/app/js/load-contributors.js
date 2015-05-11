@@ -8,13 +8,13 @@ var contributors = new Bloodhound({
   }
 });
 
-$('#typeahead_contributor .typeahead').typeahead({
+$('#contributor_input').typeahead({
+  hint: true,
   highlight: true,
   minLength: 2
 },
 {
   name: 'contributors',
-  limit: 5,
   display: 'value',
   source: contributors
 });
@@ -22,10 +22,11 @@ $('#typeahead_contributor .typeahead').typeahead({
 $('#add_contributor').submit(function(e){
   e.preventDefault();
 
-  var $contributor = $('#contributor');
+  var $contributor = $('#contributor_input');
   if (!$contributor.val()){
     return;
   }
+  var url = $(this).attr('action');
 
   $.ajax({
     method: 'POST',
@@ -36,8 +37,45 @@ $('#add_contributor').submit(function(e){
   .fail(function(data) {
     console.log(data.responseText);
   })
-  .done(function( data ) {
-    $('#contributors').append('<p>'+$contributor.val()+'</p>')
+  .done(function() {
+    var row = '<tr><td>'+$contributor.val()+'</td><td>' +
+          '<a href="'+url + $contributor.val()+'/" class="remove_contributor" rel="nofollow">' +
+          '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
+          '</a></td></tr>';
+    $('#contributors').append(row);
     $contributor.val('');
+  });
+});
+
+$('#contributors').on('click', '.remove_contributor', function(e) {
+  e.preventDefault();
+
+  var $contributor_row = $(this).parent().parent();
+
+  $.ajax({
+    method: 'DELETE',
+    url: $(this).attr('href'),
+    headers: {'X-CSRFToken': $.cookie('csrftoken') }
+  })
+  .fail(function(data) {
+    console.log(data.responseText);
+  })
+  .done(function() {
+    $contributor_row.fadeOut(function() { $(this).remove(); });
+  });
+});
+
+
+$('#delete_dataset').click(function(e) {
+  $.ajax({
+    method: 'DELETE',
+    url: $(this).attr('href'),
+    headers: {'X-CSRFToken': $.cookie('csrftoken') }
+  })
+  .fail(function(data) {
+    console.log(data.responseText);
+  })
+  .done(function(data) {
+    window.location.href = data.redirect;
   });
 });

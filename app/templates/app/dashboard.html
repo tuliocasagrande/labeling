@@ -3,5 +3,16 @@
 {% block title %}Labeling{% endblock %}
 
 {% block content %}
-  <a href="{% url 'datasets_new' %}">New dataset</a>
+  <a href="{% url 'datasets_new' %}" class="btn btn-primary">New dataset</a>
+
+  <h2>My datasets</h2>
+  {% for dataset in my_datasets %}
+    <a href="{% url 'datasets_show' dataset.id %}">{{ dataset.name }}</a>
+  {% endfor %}
+
+  <h2>Others datasets</h2>
+  {% for others in others_datasets %}
+    <a href="{% url 'datasets_show' others.dataset.id %}">{{ others.dataset.name }}</a>
+  {% endfor %}
+
 {% endblock %}
