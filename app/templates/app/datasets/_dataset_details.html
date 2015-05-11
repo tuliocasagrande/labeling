@@ -1,0 +1,35 @@
+<h3>Dataset details</h3>
+
+<div class="row">
+  <strong class="col-sm-6">Dataset name:</strong>
+  <p class="col-sm-6">{{ dataset.name }}</p>
+</div>
+
+<div class="row">
+  <strong class="col-sm-6">Number of instances:</strong>
+  <p class="col-sm-6">{{ dataset.number_of_samples }}</p>
+</div>
+
+<div class="row">
+  <strong class="col-sm-6">Number of labels:</strong>
+  <p class="col-sm-6">{{ dataset.number_of_labels }}</p>
+</div>
+
+<div class="row">
+  <strong class="col-sm-6">Owner:</strong>
+  <p class="col-sm-6">{{ dataset.owner }}</p>
+</div>
+
+<div class="row">
+  <strong class="col-sm-6">Privacy:</strong>
+  <p class="col-sm-6">{{ dataset.privacy }}</p>
+</div>
+
+<strong>Description:</strong>
+<p align="justify">
+  {% if dataset.description %}{{ dataset.description }}{% endif %}
+</p>
+
+<a class="btn btn-default" href="{% url 'datasets_download' dataset.id %}" role="button">
+  Download <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+</a>

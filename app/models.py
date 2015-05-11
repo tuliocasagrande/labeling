@@ -4,8 +4,10 @@ from django.contrib.auth.models import User
 class Dataset(models.Model):
   owner = models.ForeignKey(User)
   name = models.CharField(max_length=50)
+  description = models.TextField(null=True, blank=True)
   privacy = models.CharField(default='restricted', max_length=10)
   number_of_labels = models.IntegerField(default=2)
+  number_of_samples = models.IntegerField(default=0)
   header = models.TextField(null=True, blank=True)
   label_name = models.CharField(max_length=50, null=True, blank=True)
 

@@ -1,27 +1,27 @@
 {% extends "app/base.html" %}
 
-{% block title %}New dataset · Labeling{% endblock %}
+{% block title %}Edit dataset · Labeling{% endblock %}
 
 {% block content %}
 <div class="row">
   <div class="col-md-offset-3 col-md-6">
-    <h2>New dataset</h2>
+    <h2>Edit dataset</h2>
 
-    <form class="well well-lg" action="{% url 'datasets_create' %}" method="POST" enctype="multipart/form-data">
+    <form class="well well-lg" action="{% url 'datasets_update' dataset.id %}" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
 
       <div class="row">
         <div class="col-sm-8">
           <div class="form-group">
             <label for="name">Dataset name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" maxlength="50" required autofocus>
+            <input type="text" class="form-control" id="name" name="name" maxlength="50" value="{{ dataset.name }}">
           </div>
         </div>
 
         <div class="col-sm-4">
           <div class="form-group">
             <label for="number_of_labels">Number of labels</label>
-            <input type="number" class="form-control" id="number_of_labels" name="number_of_labels" value="2">
+            <input type="number" class="form-control" id="number_of_labels" name="number_of_labels" value="{{ dataset.number_of_labels }}">
           </div>
         </div>
       </div>
@@ -30,35 +30,8 @@
         <div class="col-sm-12">
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional"></textarea>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional">{{ dataset.description }}</textarea>
           </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="form-group">
-            <label for="dataset">File input</label>
-            <input type="file" name="dataset" id="dataset" required>
-            <p class="help-block">Choose a CSV file.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" id="has_header" name="has_header" checked> First row is header
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <label for="label_name">Label column name</label>
-          <select class="form-control" id="label_name" name="label_name"></select>
         </div>
       </div>
 
@@ -68,7 +41,7 @@
         <div class="col-sm-12">
           <div class="radio">
             <label>
-              <input type="radio" id="dataset_public" name="privacy" value="public" />
+              <input type="radio" id="dataset_public" name="privacy" value="public" {% if dataset.privacy == 'public' %}checked{% endif %}/>
               <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Public
             </label>
             <p class="help-block">Anyone can see and label this dataset.</p>
@@ -80,7 +53,7 @@
         <div class="col-sm-12">
           <div class="radio">
             <label>
-              <input type="radio" checked id="dataset_restricted" name="privacy" value="restricted" />
+              <input type="radio" id="dataset_restricted" name="privacy" value="restricted" {% if dataset.privacy == 'restricted' %}checked{% endif %} />
               <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Restricted
             </label>
             <p class="help-block">Anyone can see this dataset. You choose who can label.</p>
@@ -92,7 +65,7 @@
         <div class="col-sm-12">
           <div class="radio">
             <label>
-              <input type="radio" id="dataset_private" name="privacy" value="private" />
+              <input type="radio" id="dataset_private" name="privacy" value="private" {% if dataset.privacy == 'private' %}checked{% endif %}/>
               <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Private
             </label>
             <p class="help-block">You choose who can see and label this dataset.</p>

@@ -22,6 +22,7 @@ def create(request):
     dataset.owner = request.user
     dataset.name = request.POST['name']
     dataset.number_of_labels = request.POST['number_of_labels']
+    dataset.description = request.POST['description']
 
     if not dataset.privacy_validation(request.POST['privacy']):
       return render(request, '400.html', status=400)
@@ -39,7 +40,9 @@ def create(request):
 
     dataset.save()
 
+    number_of_samples = 0
     for row_list in reader:
+      number_of_samples += 1
       if has_header:
         label_string = row_list.pop(label_index)
         row = _write_row(row_list).strip()
@@ -56,6 +59,9 @@ def create(request):
         sample = Sample(dataset=dataset, data=row)
         sample.save()
 
+    dataset.number_of_samples = number_of_samples
+    dataset.save()
+
     return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
 # GET /datasets/<dataset_id>
@@ -63,18 +69,47 @@ def show(request, dataset_id):
   if request.method == 'GET':
     dataset = get_object_or_404(Dataset, pk=dataset_id)
 
-    if not dataset.is_accessible_to(request.user):
+    if dataset.is_owned_by(request.user):
+      contributors = Contribution.objects.filter(dataset=dataset, active=True)
+      context = {'dataset': dataset, 'contributors': contributors}
+      return render(request, 'app/datasets/show_admin.html', context)
+
+    else:
+      if not dataset.is_accessible_to(request.user):
+        raise PermissionDenied
+
+      context = {'dataset': dataset}
+      return render(request, 'app/datasets/show.html', context)
+
+# GET /photos/<dataset_id>/edit
+@login_required
+def edit(request, dataset_id):
+  if request.method == 'GET':
+    dataset = get_object_or_404(Dataset, pk=dataset_id)
+
+    if not dataset.is_owned_by(request.user):
       raise PermissionDenied
 
-    user_is_owner = dataset.is_owned_by(request.user)
-    if user_is_owner:
-      contributors = Contribution.objects.filter(dataset=dataset, active=True)
-    else:
-      contributors = []
+    context = {'dataset': dataset}
+    return render(request, 'app/datasets/edit.html', context)
 
-    context = {'dataset': dataset, 'contributors': contributors,
-               'user_is_owner': user_is_owner}
-    return render(request, 'app/datasets/show.html', context)
+# POST /photos/<dataset_id>/update
+@login_required
+def update(request, dataset_id):
+  if request.method == 'POST':
+    dataset = get_object_or_404(Dataset, pk=dataset_id)
+
+    if not dataset.is_owned_by(request.user):
+      raise PermissionDenied
+
+    dataset.name = request.POST['name']
+    dataset.number_of_labels = request.POST['number_of_labels']
+    dataset.description = request.POST['description']
+    if not dataset.privacy_validation(request.POST['privacy']):
+      return render(request, '400.html', status=400)
+    dataset.save()
+
+    return HttpResponseRedirect(reverse('datasets_show', args=(dataset.id,)))
 
 # DELETE /datasets/<dataset_id>/destroy
 @login_required

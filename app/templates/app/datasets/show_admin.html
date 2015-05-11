@@ -1,0 +1,89 @@
+{% extends "app/base.html" %}
+
+{% block title %}Show dataset · Labeling{% endblock %}
+{% block css %}
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'vendor/css/typeahead.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-6">
+    {% include "app/datasets/_dataset_details.html" %}
+    <a class="btn btn-primary" href="{% url 'datasets_edit' dataset.id %}" role="button">
+      Edit <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div class="col-sm-6">
+    <h3>Contributors</h3>
+    <form id="add_contributor" action="{% url 'contributors_create' dataset.id %}" method="POST">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <input class="form-control" id="contributor_input" type="text" autocomplete="off" placeholder="Username">
+        <span class="input-group-btn">
+          <input class="btn btn-default" type="submit" value="Add contributor">
+        </span>
+      </div>
+    </form>
+
+    <table id="contributors" class="table table-striped">
+      <tr>
+        <td class="col-xs-10">{{ request.user }}</td>
+        <td class="col-xs-2">Owner</td>
+      </tr>
+      {% for c in contributors %}
+      <tr>
+        <td>{{ c.contributor }}</td>
+        <td>
+          <a href="{% url 'contributors_destroy' dataset.id c.contributor %}" class="remove_contributor" rel="nofollow">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <h3>Danger zone!</h3>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete_dataset_modal">
+      Delete dataset
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <!-- Delete dataset modal -->
+  <div class="modal fade" id="delete_dataset_modal" tabindex="-1" role="dialog" aria-labelledby="delete-dataset-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="delete-dataset-label">
+            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+            Delete dataset
+            <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+          </h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this dataset? This operation has no turning back!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" href="{% url 'datasets_destroy' dataset.id %}" class="btn btn-danger" id="delete_dataset" rel="nofollow">
+            Delete dataset
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+  {% load staticfiles %}
+  <script src="{% static 'vendor/js/typeahead.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/js/js.cookie.js' %}"></script>
+  <script src="{% static 'app/js/dataset-admin.js' %}"></script>
+{% endblock %}
