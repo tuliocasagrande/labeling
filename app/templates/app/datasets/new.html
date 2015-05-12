@@ -93,7 +93,7 @@
           <div class="radio">
             <label>
               <input type="radio" id="dataset_private" name="privacy" value="private" />
-              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Private
+              <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Private
             </label>
             <p class="help-block">You choose who can see and label this dataset.</p>
           </div>
@@ -103,6 +103,7 @@
       <hr>
 
       <button type="submit" class="btn btn-primary">Submit dataset</button>
+      <a href="{% url 'index' %}" class="btn btn-default" role="button">Cancel</a>
     </form>
   </div>
 </div>

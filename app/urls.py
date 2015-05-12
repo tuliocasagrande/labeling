@@ -14,6 +14,7 @@ urlpatterns = patterns('',
   url(r'^datasets/(?P<dataset_id>[0-9]+)/edit/$', views_datasets.edit, name='datasets_edit'),
   url(r'^datasets/(?P<dataset_id>[0-9]+)/update/$', views_datasets.update, name='datasets_update'),
   url(r'^datasets/(?P<dataset_id>[0-9]+)/destroy/$', views_datasets.destroy, name='datasets_destroy'),
+  url(r'^datasets/(?P<dataset_id>[0-9]+)/label/$', views_datasets.label, name='datasets_label'),
   url(r'^datasets/(?P<dataset_id>[0-9]+)/download/$', views_datasets.download, name='datasets_download'),
 
   # Contributors

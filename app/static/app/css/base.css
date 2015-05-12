@@ -22,3 +22,10 @@ body {
   background-color: #333;
 }
 
+.hide-column {
+  cursor: pointer;
+}
+
+.show-column {
+  display: none;
+}

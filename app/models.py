@@ -14,24 +14,37 @@ class Dataset(models.Model):
   def __unicode__(self):
     return self.name
 
+  def is_owned_by(self, user):
+    return self.owner == user
+
+  """ Privacy options
+  Public      Anyone can read and write
+  Restricted  Anyone can read. Only contributors can write
+  Private     Only contributors can read and write
+  """
+
   def privacy_validation(self, privacy):
     if privacy in ['public', 'restricted', 'private']:
       self.privacy = privacy
       return True
     return False
 
-  def is_accessible_to(self, user):
-    if self.is_owned_by(user) or self.privacy in ['public', 'restricted']:
+  def is_readable_by(self, user):
+    if (self.is_owned_by(user) or
+        self.privacy in ['public', 'restricted'] or
+        Contribution.objects.filter(dataset=self, contributor=user.id, active=True)):
+      # Just to make sure this method does not return the [] from the QuerySet
       return True
-
-    contributors = Contribution.objects.filter(dataset=self, active=True)
-    if user in [c.contributor for c in contributors]:
-      return True
-
     return False
 
-  def is_owned_by(self, user):
-    return self.owner == user
+  def is_writable_by(self, user):
+    if (self.is_owned_by(user) or
+        self.privacy == 'public' or
+        Contribution.objects.filter(dataset=self, contributor=user.id, active=True)):
+      # Just to make sure this method does not return the [] from the QuerySet
+      return True
+    return False
+
 
 class Contribution(models.Model):
   dataset = models.ForeignKey(Dataset)
@@ -41,9 +54,13 @@ class Contribution(models.Model):
   class Meta:
     unique_together = ('dataset', 'contributor')
 
+
 class Sample(models.Model):
   dataset = models.ForeignKey(Dataset)
   data = models.TextField()
+  original_index = models.IntegerField()  # just to create the CSV file in the same order
+  times_labeled = models.IntegerField(default=0)
+
 
 class Label(models.Model):
   sample = models.ForeignKey(Sample)

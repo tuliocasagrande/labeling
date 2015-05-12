@@ -1,0 +1,38 @@
+{% extends "app/base.html" %}
+
+{% block title %}Labeling{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div id="hidden-columns">
+    {% for c in dataset.header %}
+      <button id="table-column-{{ forloop.counter }}-btn" class="btn btn-xs btn-primary show-column" data-column="table-column-{{ forloop.counter }}" data-toggle="tooltip" data-placement="right" title="Show column">
+        {{ c }} <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      </button>
+    {% endfor %}
+    </div>
+
+    <table class="table table-striped">
+      <tr>
+      {% for c in dataset.header %}
+        <th class="table-column-{{ forloop.counter }}">
+          {{ c }} <span class="glyphicon glyphicon-remove hide-column" data-column="table-column-{{ forloop.counter }}" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="Hide column"></span>
+        </th>
+      {% endfor %}
+        <th>{{ dataset.label_name }}</th>
+      </tr>
+      {% include "app/datasets/_sample_rows.html" %}
+    </table>
+
+    <button id="more_labels" class="btn btn-primary">More labels</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+  {% load staticfiles %}
+  <script src="{% static 'vendor/js/js.cookie.js' %}"></script>
+  <script src="{% static 'app/js/label.js' %}"></script>
+{% endblock %}
