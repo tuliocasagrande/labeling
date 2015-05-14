@@ -1,8 +1,15 @@
+{% load user_is_owner %}
+{% user_is_owner as user_is_owner %}
 <h3>Dataset details</h3>
 
 <div class="row">
   <strong class="col-sm-6">Dataset name:</strong>
   <p class="col-sm-6">{{ dataset.name }}</p>
+</div>
+
+<div class="row">
+  <strong class="col-sm-6">Owner:</strong>
+  <p class="col-sm-6">{{ dataset.owner }}</p>
 </div>
 
 <div class="row">
@@ -16,20 +23,27 @@
 </div>
 
 <div class="row">
-  <strong class="col-sm-6">Owner:</strong>
-  <p class="col-sm-6">{{ dataset.owner }}</p>
-</div>
-
-<div class="row">
   <strong class="col-sm-6">Privacy:</strong>
-  <p class="col-sm-6">{{ dataset.privacy }}</p>
+  <p class="col-sm-6">
+  {% if dataset.privacy == 'public' %}
+    <span data-toggle="tooltip" data-placement="top" title="Anyone can see and label this dataset.">
+      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Public
+    </span>
+  {% elif dataset.privacy == 'restricted' %}
+    <span data-toggle="tooltip" data-placement="top" title="Anyone can see this dataset. {% if user_is_owner %}You{% else %}The owner{%endif %} choose who can label.">
+      <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Restricted
+    </span>
+  {% else %}
+    <span data-toggle="tooltip" data-placement="top" title="{% if user_is_owner %}You{% else %}The owner{%endif %} choose who can see and label this dataset.">
+     <span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Private
+    </span>
+  {% endif %}
+  </p>
 </div>
 
+{% if dataset.description %}
 <strong>Description:</strong>
 <p align="justify">
-  {% if dataset.description %}{{ dataset.description }}{% endif %}
+  {{ dataset.description }}
 </p>
-
-<a class="btn btn-default" href="{% url 'datasets_download' dataset.id %}" role="button" download>
-  Download <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
-</a>
+{% endif %}

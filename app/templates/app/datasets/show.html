@@ -3,9 +3,30 @@
 {% block title %}Show dataset · Labeling{% endblock %}
 
 {% block content %}
+{% load user_can_write %}
+{% user_can_write as user_can_write %}
 <div class="row">
   <div class="col-md-offset-3 col-md-6">
+
+    <a class="btn btn-default" href="{% url 'index' %}" role="button">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+    </a>
+    <div class="btn-group pull-right" role="group" aria-label="dataset-buttons">
+      <a class="btn btn-primary" href="{% url 'datasets_download' dataset.id %}" role="button" download>
+        Download <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+      </a>
+      {% if user_can_write %}
+      <a class="btn btn-primary" href="{% url 'datasets_label' dataset.id %}" role="button">
+        Label <span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+      </a>
+      {% endif %}
+    </div>
+
     {% include "app/datasets/_dataset_details.html" %}
   </div>
 </div>
+{% endblock %}
+
+{% block js%}
+<script>$(function(){ $('[data-toggle="tooltip"]').tooltip(); });</script>
 {% endblock %}

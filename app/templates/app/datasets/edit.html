@@ -7,21 +7,20 @@
   <div class="col-md-offset-3 col-md-6">
     <h2>Edit dataset</h2>
 
-    <form class="well well-lg" action="{% url 'datasets_update' dataset.id %}" method="POST" enctype="multipart/form-data">
+    <form class="well well-lg" action="{% url 'datasets_update' dataset.id %}" method="POST">
       {% csrf_token %}
 
       <div class="row">
         <div class="col-sm-8">
           <div class="form-group">
             <label for="name">Dataset name</label>
-            <input type="text" class="form-control" id="name" name="name" maxlength="50" value="{{ dataset.name }}">
+            <input type="text" class="form-control" id="name" name="name" maxlength="50" value="{{ dataset.name }}" required>
           </div>
         </div>
-
         <div class="col-sm-4">
           <div class="form-group">
             <label for="number_of_labels">Number of labels</label>
-            <input type="number" class="form-control" id="number_of_labels" name="number_of_labels" value="{{ dataset.number_of_labels }}">
+            <input type="number" class="form-control" id="number_of_labels" name="number_of_labels" value="{{ dataset.number_of_labels }}" required>
           </div>
         </div>
       </div>
@@ -30,7 +29,7 @@
         <div class="col-sm-12">
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional">{{ dataset.description }}</textarea>
+            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Optional">{{ dataset.description }}</textarea>
           </div>
         </div>
       </div>
@@ -48,7 +47,6 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-sm-12">
           <div class="radio">
@@ -60,7 +58,6 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-sm-12">
           <div class="radio">
@@ -75,15 +72,9 @@
 
       <hr>
 
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary">Save <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
       <a href="{% url 'datasets_show' dataset.id %}" class="btn btn-default" role="button">Cancel</a>
     </form>
   </div>
 </div>
-{% endblock %}
-
-{% block js %}
-  {% load staticfiles %}
-  <script src="{% static 'vendor/js/csv.min.js' %}"></script>
-  <script src="{% static 'app/js/load-csv.js' %}"></script>
 {% endblock %}

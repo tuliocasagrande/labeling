@@ -66,12 +66,7 @@
     {% csrf_token %}
     <button type="submit"></button>
   </form>
-  <script>
-    $('#logout-navbar').click(function(e){
-      $('#logout-form').submit();
-      e.preventDefault();
-    });
-  </script>
+  <script>$(function(){ $('#logout-navbar').click(function(e){ $('#logout-form').submit(); e.preventDefault(); });});</script>
   {% endif %}
 </body>
 </html>
