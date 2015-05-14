@@ -1,17 +1,4 @@
-function readDataset(file) {
-  if (!file) {
-    return;
-  }
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var contents = e.target.result;
-    displayHeader(contents);
-  };
-  reader.readAsText(file);
-}
-
-function displayHeader(contents) {
-  var header = new CSV(contents).parse()[0];
+function displayHeader(header) {
   var $label_name = $("#label_name");
   $label_name.html("");
   header.forEach(function(record) {
@@ -22,9 +9,15 @@ function displayHeader(contents) {
 
 $(function(){
   $("#dataset").change(function(){
-    var file = this.files[0];
-    readDataset(file);
+    $(this).parse({
+      config: {
+        complete: function(results, file) {
+          displayHeader(results.data[0]);
+        }
+      }
+    });
   });
+
   // Just in case the user clicks the browser's back button
   $("#dataset").change();
 
@@ -36,4 +29,5 @@ $(function(){
     }
   });
 });
+
 
