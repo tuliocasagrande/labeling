@@ -17,11 +17,14 @@
     <table class="table table-striped">
       <tr>
       {% for c in dataset.header %}
+      {% if forloop.last %}
+        <th>{{ c }}</th>
+      {% else %}
         <th class="table-column-{{ forloop.counter }}">
           {{ c }} <span class="glyphicon glyphicon-remove hide-column" data-column="table-column-{{ forloop.counter }}" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="Hide column"></span>
         </th>
+      {% endif %}
       {% endfor %}
-        <th>{{ dataset.label_name }}</th>
       </tr>
       {% include "app/datasets/_sample_rows.html" %}
     </table>

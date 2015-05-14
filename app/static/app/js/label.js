@@ -1,4 +1,6 @@
 $(function () {
+  $('#body-container').removeClass('container').addClass('container-fluid');
+
   $('[data-toggle="tooltip"]').tooltip();
 
   $('.hide-column').click(function() {

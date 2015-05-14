@@ -28,38 +28,34 @@ def create(request):
     if not dataset.privacy_validation(request.POST['privacy']):
       return render(request, '400.html', status=400)
 
-    has_header = request.POST.get('has_header', False)
     dataset_file = request.FILES['dataset']
     reader = csv.reader(dataset_file, encoding='utf-8')
-    if has_header:
-      dataset.label_name = request.POST['label_name']
-      header_list = reader.next()
-      label_index = header_list.index(dataset.label_name)
+    header_list = reader.next()
+
+    label_name = request.POST.get('label_name', 'CLASS')
+    append_label_column = request.POST.get('append_label_column', False)
+    if not append_label_column:
+      label_index = header_list.index(label_name)
       header_list.pop(label_index)
 
-      dataset.header = csv_to_string(header_list).strip()
-
+    header_list.append(label_name)
+    dataset.header = csvlist_to_string(header_list).strip()
     dataset.save()
 
     samples_count = 0
     for row_list in reader:
       samples_count += 1
-      if has_header:
+      if not append_label_column:
         label_string = row_list.pop(label_index)
-        row = csv_to_string(row_list).strip()
 
-        sample = Sample(dataset=dataset, data=row, original_index=samples_count)
-        sample.save()
+      row = csvlist_to_string(row_list).strip()
+      sample = Sample(dataset=dataset, data=row, original_index=samples_count)
+      sample.save()
 
-        if label_string:
-          label = Label(owner=request.user, sample=sample, label=label_string)
-          label.save()
-          sample.times_labeled = 1
-          sample.save()
-
-      else:
-        row = csv_to_string(row_list).strip()
-        sample = Sample(dataset=dataset, data=row, original_index=samples_count)
+      if not append_label_column and label_string:
+        label = Label(owner=request.user, sample=sample, label=label_string)
+        label.save()
+        sample.times_labeled = 1
         sample.save()
 
     dataset.number_of_samples = samples_count
@@ -141,9 +137,9 @@ def label(request, dataset_id):
     samples = Sample.objects.filter(dataset=dataset).order_by('times_labeled')
     samples = samples[:10]
 
-    dataset.header = string_to_csv(dataset.header)
+    dataset.header = string_to_csvlist(dataset.header)
     for s in samples:
-      s.data = string_to_csv(s.data)
+      s.data = string_to_csvlist(s.data)
 
     context = {'dataset': dataset, 'samples': samples}
 
@@ -172,7 +168,7 @@ def download(request, dataset_id):
     raise PermissionDenied
 
   samples = Sample.objects.filter(dataset=dataset).order_by('original_index')
-  csv = u'{0},"{1}"\n'.format(dataset.header, dataset.label_name)
+  csv = u'{0}\n'.format(dataset.header)
   print '{0} samples!!!'.format(len(samples))
   for sample in samples:
     labels = Label.objects.filter(sample=sample) #TODO: add active contributors
@@ -189,15 +185,15 @@ def download(request, dataset_id):
   response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(dataset.name)
   return response
 
-def csv_to_string(csv_list):
+def csvlist_to_string(csvlist):
   f = StringIO()
-  csv.writer(f, quoting=csv.QUOTE_ALL, encoding='utf-8').writerow(csv_list)
+  csv.writer(f, quoting=csv.QUOTE_MINIMAL, encoding='utf-8').writerow(csvlist)
   string = f.getvalue()
   f.close()
   return string
 
-def string_to_csv(string):
+def string_to_csvlist(string):
   f = StringIO(string.encode('utf8'))
-  csv_list = csv.reader(f, encoding='utf-8').next()
+  csvlist = csv.reader(f, encoding='utf-8').next()
   f.close()
-  return csv_list
+  return csvlist

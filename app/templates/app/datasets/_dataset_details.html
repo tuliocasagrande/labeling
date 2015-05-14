@@ -30,6 +30,6 @@
   {% if dataset.description %}{{ dataset.description }}{% endif %}
 </p>
 
-<a class="btn btn-default" href="{% url 'datasets_download' dataset.id %}" role="button">
+<a class="btn btn-default" href="{% url 'datasets_download' dataset.id %}" role="button" download>
   Download <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
 </a>

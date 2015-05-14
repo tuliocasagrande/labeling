@@ -8,8 +8,7 @@ class Dataset(models.Model):
   privacy = models.CharField(default='restricted', max_length=10)
   number_of_labels = models.IntegerField(default=2)
   number_of_samples = models.IntegerField(default=0)
-  header = models.TextField(null=True, blank=True)
-  label_name = models.CharField(max_length=50, null=True, blank=True)
+  header = models.TextField()
 
   def __unicode__(self):
     return self.name

@@ -18,16 +18,18 @@ $(function(){
     });
   });
 
-  // Just in case the user clicks the browser's back button
-  $("#dataset").change();
-
-  $("#has_header").change(function() {
+  $("#append_label_column").change(function() {
     if ($(this).is(":checked")) {
-      $("#label_name").prop('disabled', false);
+      $("#label_name_row").fadeOut(function() {
+        $("#label_name").prop('disabled', true);
+      });
     } else {
-      $("#label_name").prop('disabled', true);
+      $("#label_name").prop('disabled', false);
+      $("#label_name_row").fadeIn();
     }
   });
+
+  // Just in case the user clicks the browser's back button
+  $("#dataset").change();
+  $("#append_label_column").change();
 });
-
-
