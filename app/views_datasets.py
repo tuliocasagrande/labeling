@@ -138,9 +138,8 @@ def label(request, dataset_id):
     raise PermissionDenied
 
   if request.method == 'GET':
-    samples_number = request.POST.get('samples_number', 10)
     samples = Sample.objects.filter(dataset=dataset).order_by('times_labeled')
-    samples = samples[:samples_number]
+    samples = samples[:10]
 
     dataset.header = string_to_csv(dataset.header)
     for s in samples:
@@ -155,7 +154,15 @@ def label(request, dataset_id):
       return render(request, 'app/datasets/label.html', context)
 
   elif request.method == 'POST':
-    return HttpResponse('posted!')
+    sample = Sample.objects.get(pk=request.POST['sample_id'])
+
+    label = Label(owner=request.user, sample=sample, label=request.POST['label'])
+    label.save()
+
+    sample.times_labeled = 1
+    sample.save()
+
+    return HttpResponse()
 
 # GET /datasets/<dataset_id>/download
 def download(request, dataset_id):

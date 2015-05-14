@@ -4,27 +4,27 @@
   {% for c in s.data %}
     <td class="table-column-{{ forloop.counter }}">{{ c }}</td>
   {% endfor %}
-    <td>
+    <td data-sample-id="{{ s.id }}">
     {% if dataset.number_of_labels == 2 %}
-      <button class="btn btn-xs btn-danger">
+      <button class="btn btn-xs btn-danger label-btn" btn-color="btn-danger" data-label="0">
         <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
       </button>
-      <button class="btn btn-xs btn-success">
+      <button class="btn btn-xs btn-success label-btn" btn-color="btn-success" data-label="1">
         <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
       </button>
     {% elif dataset.number_of_labels == 3 %}
-      <button class="btn btn-xs btn-danger">
+      <button class="btn btn-xs btn-danger label-btn" btn-color="btn-danger" data-label="0">
         <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
       </button>
-      <button class="btn btn-xs btn-warning">
-        <span class="glyphicon glyphicon-random" aria-hidden="true"></span>
+      <button class="btn btn-xs btn-warning label-btn" btn-color="btn-warning" data-label="1">
+        <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
       </button>
-      <button class="btn btn-xs btn-success">
+      <button class="btn btn-xs btn-success label-btn" btn-color="btn-success" data-label="2">
         <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
       </button>
     {% else %}
       {% for i in dataset.number_of_labels|get_range %}
-      <button class="btn btn-xs btn-primary">
+      <button class="btn btn-xs btn-primary label-btn" btn-color="btn-primary" data-label="{{ i }}">
         {{ i }}
       </button>
       {% endfor %}
