@@ -134,6 +134,9 @@ def label(request, dataset_id):
     raise PermissionDenied
 
   if request.method == 'GET':
+    # user_labeled_samples = Label.objects.filter(owner=request.user, sample=sample).values('sample_id')
+    # samples = Sample.objects.filter(dataset=dataset).order_by('times_labeled').exclude(pk__in=user_labeled_samples)
+
     samples = Sample.objects.filter(dataset=dataset).order_by('times_labeled')
     samples = samples[:10]
 
@@ -152,11 +155,13 @@ def label(request, dataset_id):
   elif request.method == 'POST':
     sample = Sample.objects.get(pk=request.POST['sample_id'])
 
-    label = Label(owner=request.user, sample=sample, label=request.POST['label'])
-    label.save()
+    obj, created = Label.objects.update_or_create(
+                      owner=request.user, sample=sample,
+                      defaults={'label': request.POST['label']})
 
-    sample.times_labeled = 1
-    sample.save()
+    if created:
+      sample.times_labeled += 1
+      sample.save()
 
     return HttpResponse()
 
