@@ -6,6 +6,9 @@
 
 <div class="row">
   <div class="col-md-12">
+  {% if not samples %}
+    <p>It seems you already did your best and labeled this entire dataset. : ) </p>
+  {% else %}
     <div id="hidden-columns">
     {% for c in dataset.header %}
       <button id="table-column-{{ forloop.counter }}-btn" class="btn btn-xs btn-primary show-column" data-column="table-column-{{ forloop.counter }}" data-toggle="tooltip" data-placement="right" title="Show column">
@@ -30,6 +33,7 @@
     </table>
 
     <button id="more_labels" class="btn btn-primary">More labels</button>
+  {% endif %}
   </div>
 </div>
 {% endblock %}
