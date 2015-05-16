@@ -11,25 +11,31 @@
   {% else %}
     <div id="hidden-columns">
     {% for c in dataset.header %}
-      <button id="table-column-{{ forloop.counter }}-btn" class="btn btn-xs btn-primary show-column" data-column="table-column-{{ forloop.counter }}" data-toggle="tooltip" data-placement="right" title="Show column">
+    {% if not forloop.last %}
+      <button id="table-column-{{ forloop.counter }}-btn" class="btn btn-xs btn-primary show-column" data-column="{{ forloop.counter }}" data-toggle="tooltip" data-placement="right" title="Show column">
         {{ c }} <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       </button>
+    {% endif %}
     {% endfor %}
     </div>
 
     <table class="table table-striped">
-      <tr>
-      {% for c in dataset.header %}
-      {% if forloop.last %}
-        <th>{{ c }}</th>
-      {% else %}
-        <th class="table-column-{{ forloop.counter }}">
-          {{ c }} <span class="glyphicon glyphicon-remove hide-column" data-column="table-column-{{ forloop.counter }}" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="Hide column"></span>
-        </th>
-      {% endif %}
-      {% endfor %}
-      </tr>
-      {% include "app/datasets/_sample_rows.html" %}
+      <thead>
+        <tr>
+        {% for c in dataset.header %}
+        {% if forloop.last %}
+          <th>{{ c }}</th>
+        {% else %}
+          <th class="table-column-{{ forloop.counter }}">
+            {{ c }} <span class="glyphicon glyphicon-remove hide-column" data-column="{{ forloop.counter }}" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="Hide column"></span>
+          </th>
+        {% endif %}
+        {% endfor %}
+        </tr>
+      </thead>
+      <tbody id="samples_tbody">
+        {% include "app/datasets/_sample_rows.html" %}
+      </tbody>
     </table>
 
     <button id="more_labels" class="btn btn-primary">More labels</button>
