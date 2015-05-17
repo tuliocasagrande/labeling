@@ -13,13 +13,15 @@ body {
 }
 
 /* Most typeahead customizations come from typeahead.css */
-.tt-suggestion {
-  cursor: pointer;
-}
-.tt-dataset :hover, .tt-cursor {
+.tt-menu .tt-suggestion.tt-cursor,
+.tt-menu .tt-suggestion:hover {
   /* navbar colors */
   color: #9d9d9d;
   background-color: #333;
+}
+.tt-menu .tt-suggestion.tt-cursor a,
+.tt-menu .tt-suggestion:hover a {
+  color: #9d9d9d;
 }
 
 .hide-column {
