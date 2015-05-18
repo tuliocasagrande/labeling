@@ -5,7 +5,7 @@ $(function(){
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: '/users/search/%QUERY',
+      url: $('#logo_index').attr('href') + 'users/search/%QUERY',
       wildcard: '%QUERY'
     }
   });

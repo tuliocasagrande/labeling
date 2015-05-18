@@ -130,6 +130,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Allauth configurations
+LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'index'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'index'
 SOCIALACCOUNT_QUERY_EMAIL = True
@@ -143,6 +144,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_USERNAME_BLACKLIST = ['admin', 'adm', 'labeling', 'lasid', 'ufscar']
 
 
 # SendGrid
