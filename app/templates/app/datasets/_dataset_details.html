@@ -1,3 +1,4 @@
+{% load humanize %}
 {% load user_is_owner %}
 {% user_is_owner as user_is_owner %}
 <h3>Dataset details</h3>
@@ -14,12 +15,12 @@
 
 <div class="row">
   <strong class="col-sm-6">Number of instances:</strong>
-  <p class="col-sm-6">{{ dataset.number_of_samples }}</p>
+  <p class="col-sm-6">{{ dataset.number_of_samples | intcomma }}</p>
 </div>
 
 <div class="row">
   <strong class="col-sm-6">Number of labels:</strong>
-  <p class="col-sm-6">{{ dataset.number_of_labels }}</p>
+  <p class="col-sm-6">{{ dataset.number_of_labels | intcomma }}</p>
 </div>
 
 <div class="row">

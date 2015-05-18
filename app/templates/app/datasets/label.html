@@ -3,12 +3,16 @@
 {% block title %}Labeling{% endblock %}
 
 {% block content %}
-
+{% load humanize %}
 <div class="row">
   <div class="col-md-12">
-  {% if not samples %}
-    <p>It seems you already did your best and labeled this entire dataset. : ) </p>
-  {% else %}
+    <a class="btn btn-default" href="{% url 'datasets_show' dataset.id %}" role="button">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+    </a>
+
+    <h3><span class="glyphicon glyphicon-book" aria-hidden="true"></span> {{ dataset.owner }}/{{ dataset.name }} <small>{{ dataset.number_of_samples | intcomma }} samples</small></h3>
+  {% if samples %}
+  <div id="labeling-wrapper">
     <div id="hidden-columns">
     {% for c in dataset.header %}
     {% if not forloop.last %}
@@ -37,9 +41,11 @@
         {% include "app/datasets/_sample_rows.html" %}
       </tbody>
     </table>
-
-    <button id="more_labels" class="btn btn-primary">More labels</button>
+  </div>
   {% endif %}
+    <div id="done_labeling" class="alert alert-success text-center{% if samples %} hidden{% endif %}" role="alert">
+      <strong>Well done!</strong> It seems there is no more sample to label. : )
+    </div>
   </div>
 </div>
 {% endblock %}

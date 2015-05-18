@@ -1,20 +1,22 @@
-function hideColumn(column, update_url) {
-  update_url = typeof update_url !== 'undefined' ? update_url : true;
-  $('#table-column-' + column + '-btn').fadeIn();
-  $('.table-column-' + column).fadeOut().promise().done(function() {
-    if (update_url) updateUrl();
-  });
+function hideColumn(column, animate) {
+  animate = typeof animate !== 'undefined' ? animate : true;
+  $('#table-column-' + column + '-btn').fadeIn().addClass('visible-column');
+  if (animate) {
+    $('.table-column-' + column).fadeOut();
+    updateUrl();
+  } else {
+    $('.table-column-' + column).fadeOut(0);
+  }
 }
 
 function showColumn(column) {
-  $('#table-column-' + column + '-btn').fadeOut();
-  $('.table-column-' + column).fadeIn().promise().done(function() {
-    updateUrl();
-  });
+  $('#table-column-' + column + '-btn').fadeOut().removeClass('visible-column');
+  $('.table-column-' + column).fadeIn();
+  updateUrl();
 }
 
 function updateUrl() {
-  var $visible_columns = $('.show-column:visible');
+  var $visible_columns = $('.visible-column');
   var total = $visible_columns.length;
   if (total === 0) {
     window.history.replaceState({}, '', location.pathname);
@@ -39,14 +41,37 @@ function parseURI(val) {
   return result;
 }
 
-$(function () {
+function loadSamples() {
   parseURI('hidden-columns').split(',').forEach(function(item) {
     hideColumn(item, false);
   });
+  $('.unlabeled-sample').removeClass('hidden');
+}
 
+function moreSamples() {
+  $.ajax({
+    method: 'GET',
+    url: window.location,
+    headers: {'X-CSRFToken': $.cookie('csrftoken') },
+  })
+  .fail(function(data) {
+    console.log(data.responseText);
+  })
+  .done(function(data) {
+    if (data === 'done!') {
+      $('#done_labeling').removeClass('hidden');
+      $('#labeling-wrapper').remove();
+    } else {
+      $('#samples_tbody').append(data);
+      loadSamples();
+    }
+  });
+}
+
+$(function () {
   $('#body-container').removeClass('container').addClass('container-fluid');
-
   $('[data-toggle="tooltip"]').tooltip();
+  loadSamples();
 
   $('.hide-column').click(function() {
     hideColumn($(this).attr('data-column'));
@@ -74,25 +99,9 @@ $(function () {
       console.log(data.responseText);
     })
     .done(function(data) {
-      $this.parent().parent().fadeOut();
+      $this.parent().parent().fadeOut().removeClass('unlabeled-sample');
+      if ($('.unlabeled-sample').length === 0) moreSamples();
     });
   });
 
-  $('#more_labels').click(function() {
-    $.ajax({
-      method: 'GET',
-      url: window.location,
-      headers: {'X-CSRFToken': $.cookie('csrftoken') },
-    })
-    .fail(function(data) {
-      console.log(data.responseText);
-    })
-    .done(function(data) {
-      $('#samples_tbody').append(data);
-      parseURI('hidden-columns').split(',').forEach(function(item) {
-        hideColumn(item, false);
-      });
-      console.log(data);
-    });
-  });
 });

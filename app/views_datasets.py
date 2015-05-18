@@ -145,6 +145,8 @@ def label(request, dataset_id):
     context = {'dataset': dataset, 'samples': samples}
 
     if request.is_ajax():
+      if not samples:
+        return HttpResponse('done!')
       html = render_to_string('app/datasets/_sample_rows.html', context)
       return HttpResponse(html)
     else:
