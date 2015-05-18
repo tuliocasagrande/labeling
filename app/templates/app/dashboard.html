@@ -3,16 +3,67 @@
 {% block title %}Labeling{% endblock %}
 
 {% block content %}
-  <a href="{% url 'datasets_new' %}" class="btn btn-primary">New dataset</a>
+<div class="row">
 
-  <h2>My datasets</h2>
-  {% for dataset in my_datasets %}
-    <a href="{% url 'datasets_show' dataset.id %}">{{ dataset.name }}</a>
-  {% endfor %}
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title">My datasets</h2>
+      </div>
+    {% if not my_datasets %}
+      <div class="panel-body">
+        <p>You did not upload any dataset!</p>
+      </div>
+    {% endif %}
+      <ul class="list-group">
+        {% for dataset in my_datasets %}
+        <li class="list-group-item">
+          <a href="{% url 'datasets_show' dataset.id %}">{{ dataset.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <a href="{% url 'datasets_new' %}" class="btn btn-primary">New dataset</a>
+  </div>
 
-  <h2>Others datasets</h2>
-  {% for others in others_datasets %}
-    <a href="{% url 'datasets_show' others.dataset.id %}">{{ others.dataset.name }}</a>
-  {% endfor %}
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">Shared datasets</h2>
+      </div>
+    {% if not others_datasets %}
+      <div class="panel-body">
+        <p>You were not invited to contribute to any dataset!</p>
+      </div>
+    {% endif %}
+      <ul class="list-group">
+        {% for others in others_datasets %}
+        <li class="list-group-item">
+          <a href="{% url 'datasets_show' others.dataset.id %}">{{ others.dataset.owner }}/{{ others.dataset.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 
+  <div class="col-md-4">
+   <div class="panel panel-default">
+     <div class="panel-heading">
+       <h2 class="panel-title">Public datasets</h2>
+     </div>
+   {% if not public_datasets %}
+     <div class="panel-body">
+       <p>There is not any public dataset!</p>
+     </div>
+   {% endif %}
+     <ul class="list-group">
+       {% for dataset in public_datasets %}
+       <li class="list-group-item">
+         <a href="{% url 'datasets_show' dataset.id %}">{{ dataset.owner }}/{{ dataset.name }}</a>
+       </li>
+       {% endfor %}
+     </ul>
+   </div>
+  </div>
+</div>
 {% endblock %}
