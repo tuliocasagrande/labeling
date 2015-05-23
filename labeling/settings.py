@@ -147,8 +147,12 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_USERNAME_BLACKLIST = ['admin', 'adm', 'labeling', 'lasid', 'ufscar']
 
 
-# SendGrid
+# Email configuration
+ADMINS = (('Tulio', 'tuliocasagrande@gmail.com'), )
+SERVER_EMAIL = 'lasid.sor.ufscar.br/labeling'
 DEFAULT_FROM_EMAIL = 'lasid.sor.ufscar.br/labeling'
+
+# SendGrid configuration
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ['LB_SENDGRID_USR']
 EMAIL_HOST_PASSWORD = os.environ['LB_SENDGRID_PWD']
