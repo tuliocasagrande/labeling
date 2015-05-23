@@ -148,7 +148,7 @@ ACCOUNT_USERNAME_BLACKLIST = ['admin', 'adm', 'labeling', 'lasid', 'ufscar']
 
 
 # Email configuration
-ADMINS = (('Tulio', 'tuliocasagrande@gmail.com'), )
+ADMINS = (('Tulio', os.environ['LB_ADMIN_MAIL']), )
 SERVER_EMAIL = 'lasid.sor.ufscar.br/labeling'
 DEFAULT_FROM_EMAIL = 'lasid.sor.ufscar.br/labeling'
 
