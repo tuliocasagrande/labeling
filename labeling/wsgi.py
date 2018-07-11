@@ -13,6 +13,7 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "labeling.settings"
 
+
 def application(environ, start_response):
     for key in environ:
         if key.startswith('LB_'):

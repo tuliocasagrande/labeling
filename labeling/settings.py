@@ -28,7 +28,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
-### HTTPS
+# HTTPS configuration
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
@@ -97,7 +97,7 @@ WSGI_APPLICATION = 'labeling.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-import dj_database_url
+import dj_database_url  # noqa
 DATABASES = {
     'default': dj_database_url.config(default=os.environ['LB_DATABASE_URL'])
 }
@@ -137,7 +137,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': { 'access_type': 'online' }
+        'AUTH_PARAMS': {'access_type': 'online'}
     }
 }
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
